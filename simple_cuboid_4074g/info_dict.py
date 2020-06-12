@@ -5,7 +5,7 @@ info_dict = {
                 0: 'BackLeft',
                 3: 'FrontLeft'},
     'init_motorStatus': {1: {'controlMode': 0, 'targetVelocity': -13, 'force': 5},
-                            2: {'controlMode': 0, 'targetVelocity': 13, 'force': 5},
+                            2: {'controlMode': 0, 'targetVelocity': -18, 'force': 5},
                             0: {'controlMode': 0, 'targetVelocity': 2.7, 'force': 5},
                             3: {'controlMode': 0, 'targetVelocity': 14.7, 'force': 5}},
     'init_physical_para': {1: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
