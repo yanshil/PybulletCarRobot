@@ -1,18 +1,18 @@
 ## README
 
-Issue Link:
-
-https://github.com/bulletphysics/bullet3/issues/2851
+This is a repo to store related material of [this issue](https://github.com/bulletphysics/bullet3/issues/2851)
 
 
-1. Create a new environment
+### 2020/6/26 
+
+1. Create a new conda environment
 
 ```
 conda crate -n bulletTest python=3
 conda activate bulletTest
 ```
 
-2. Build from source and test (Modify your paths accordingly!!!)
+2. Build from source and test (Modify paths accordingly!!!)
 
 ```
 git clone https://github.com/bulletphysics/bullet3.git
@@ -32,24 +32,22 @@ cd /mnt/d/GitHub/PybulletCarRobot/bullet3/examples/pybullet/gym/
 export PYTHONPATH=$PYTHONPATH:"$(pwd)"
 ```
 
+* Test before applying fix
+
+```
+cd /mnt/d/GitHub/PybulletCarRobot/mecanum_simple
+python hello_mecanum.py
+
+pip install scipy matplotlib
+cd /mnt/d/GitHub/PybulletCarRobot/src
+python run.py
+## Will generate a video
+```
+
 3. Apply fix and test
 
 ```
+cd /mnt/d/GitHub/PybulletCarRobot/bullet3
+git apply ../patch.diff
+### error: corrupt patch at line 101
 ```
-
-
-
-## Run
-
-
-1. GUI control wheel velocity
-
-```
-cd src
-## Copy the info_dict from model folder and modify urdf path
-python run.py
-```
-
-
-
-2. Simple one-file script: in model folder and named as `hello_*.py`
