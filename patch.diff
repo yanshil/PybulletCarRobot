@@ -1,0 +1,101 @@
+diff --git a/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.cpp b/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.cpp
+index 6c1ed09..fe4943c 100644
+--- a/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.cpp
++++ b/src/BulletDynamics/Featherstone/btMultiBodyConstraintSolver.cpp
+@@ -25,6 +25,9 @@ subject to the following restrictions:
+ #include "BulletDynamics/Featherstone/btMultiBodySolverConstraint.h"
+ #include "LinearMath/btScalar.h"
+ 
++
++bool isPrint=false;
++
+ btScalar btMultiBodyConstraintSolver::solveSingleIteration(int iteration, btCollisionObject** bodies, int numBodies, btPersistentManifold** manifoldPtr, int numManifolds, btTypedConstraint** constraints, int numConstraints, const btContactSolverInfo& infoGlobal, btIDebugDraw* debugDrawer)
+ {
+ 	btScalar leastSquaredResidual = btSequentialImpulseConstraintSolver::solveSingleIteration(iteration, bodies, numBodies, manifoldPtr, numManifolds, constraints, numConstraints, infoGlobal, debugDrawer);
+@@ -236,7 +239,7 @@ btScalar btMultiBodyConstraintSolver::resolveSingleConstraintRowGeneric(const bt
+ 	btSolverBody* bodyB = 0;
+ 	int ndofA = 0;
+ 	int ndofB = 0;
+-
++ if (c.m_linkA != -1 && isPrint) printf("resolveconstraint linkA=%d linkB=%d\n", c.m_linkA, c.m_linkB);
+ 	if (c.m_multiBodyA)
+ 	{
+ 		ndofA = c.m_multiBodyA->getNumDofs() + 6;
+@@ -260,9 +263,10 @@ btScalar btMultiBodyConstraintSolver::resolveSingleConstraintRowGeneric(const bt
+ 		bodyB = &m_tmpSolverBodyPool[c.m_solverBodyIdB];
+ 		deltaVelBDotn += c.m_contactNormal2.dot(bodyB->internalGetDeltaLinearVelocity()) + c.m_relpos2CrossNormal.dot(bodyB->internalGetDeltaAngularVelocity());
+ 	}
+-
++if (c.m_linkA != -1 && isPrint) printf("  rhs=%f, applied=%f,cfm=%f delta=%f, deltaVelADotn=%f, a_delta=%f, deltaVelBDotn=%f,b_delta=%f,", c.m_rhs, c.m_appliedImpulse,c.m_cfm, deltaImpulse, deltaVelADotn, deltaVelADotn * c.m_jacDiagABInv,  deltaVelBDotn, deltaVelBDotn * c.m_jacDiagABInv);
+ 	deltaImpulse -= deltaVelADotn * c.m_jacDiagABInv;  //m_jacDiagABInv = 1./denom
+ 	deltaImpulse -= deltaVelBDotn * c.m_jacDiagABInv;
++if (c.m_linkA != -1 && isPrint) printf("deltaImpulse = %f, ", deltaImpulse);
+ 	const btScalar sum = btScalar(c.m_appliedImpulse) + deltaImpulse;
+ 
+ 	if (sum < c.m_lowerLimit)
+@@ -280,6 +284,7 @@ btScalar btMultiBodyConstraintSolver::resolveSingleConstraintRowGeneric(const bt
+ 		c.m_appliedImpulse = sum;
+ 	}
+ 
++if (c.m_linkA != -1 && isPrint) printf("f_deltaImpulse = %f %f %f\n", deltaImpulse, c.m_lowerLimit, c.m_upperLimit);
+ 	if (c.m_multiBodyA)
+ 	{
+ 		applyDeltaVee(&m_data.m_deltaVelocitiesUnitImpulse[c.m_jacAindex], deltaImpulse, c.m_deltaVelAindex, ndofA);
+@@ -1280,6 +1285,31 @@ void btMultiBodyConstraintSolver::convertMultiBodyContact(btPersistentManifold*
+ 		{
+ 			btScalar relaxation;
+ 
++                        const btMultiBody* mbRoller;
++                        int link;
++                        bool flag = false;
++                        btVector3 revoluteAxisInWorld;
++                        if (mbA && (fcA->m_link != -1))
++                        {
++                             mbRoller = mbA;
++                             link = fcA->m_link;
++                        }
++                        else
++                        {
++                             mbRoller = mbB;
++                             link = fcB->m_link;
++                        }
++                        if (!(fcA->m_link == -1 && fcB->m_link == -1))
++                        {
++                            flag = true;
++                            revoluteAxisInWorld = quatRotate(mbRoller->getLink(link).m_cachedWorldTransform.getRotation(), mbRoller->getLink(link).m_axes[0].m_topVec);
++                            if (strstr(mbRoller->getLink(link).m_linkName, "Wheel") == NULL) return;
++                            printf("link=%d fcA->m_link=%d fcB->m_link=%d mbA=%p mbB=%p\n", link, fcA->m_link, fcB->m_link, mbA, mbB);
++                            printf("link name=%s, joint name=%s\n", mbRoller->getLink(link).m_linkName, mbRoller->getLink(link).m_jointName);
++                            printf("    roll axis: %f:%f:%f\n", revoluteAxisInWorld[0], revoluteAxisInWorld[1], revoluteAxisInWorld[2]);
++                        }
++
++
+ 			int frictionIndex = m_multiBodyNormalContactConstraints.size();
+ 
+ 			btMultiBodySolverConstraint& solverConstraint = m_multiBodyNormalContactConstraints.expandNonInitializing();
+@@ -1300,6 +1330,7 @@ void btMultiBodyConstraintSolver::convertMultiBodyContact(btPersistentManifold*
+ 
+ 			solverConstraint.m_originalContactPoint = &cp;
+ 
++
+ 			bool isFriction = false;
+ 			setupMultiBodyContactConstraint(solverConstraint, cp.m_normalWorldOnB, cp.m_appliedImpulse, cp, infoGlobal, relaxation, isFriction);
+ 
+@@ -1326,10 +1357,16 @@ void btMultiBodyConstraintSolver::convertMultiBodyContact(btPersistentManifold*
+ 			///In that case, you can set the target relative motion in each friction direction (cp.m_contactMotion1 and cp.m_contactMotion2)
+ 			///this will give a conveyor belt effect
+ 			///
+-
++#if 0
+ 			btPlaneSpace1(cp.m_normalWorldOnB, cp.m_lateralFrictionDir1, cp.m_lateralFrictionDir2);
+ 			cp.m_lateralFrictionDir1.normalize();
+ 			cp.m_lateralFrictionDir2.normalize();
++#endif
++                        cp.m_lateralFrictionDir1 = revoluteAxisInWorld;
++                        cp.m_lateralFrictionDir1[2] = 0;
++                        cp.m_lateralFrictionDir2 = cp.m_lateralFrictionDir1.cross(cp.m_normalWorldOnB);
++                        cp.m_lateralFrictionDir1.normalize();
++                        cp.m_lateralFrictionDir2.normalize();
+ 
+ 			if (rollingFriction > 0)
+ 			{
