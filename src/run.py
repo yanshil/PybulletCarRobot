@@ -30,12 +30,17 @@ if __name__ == "__main__":
 
     options = {'global_wheel_control': False, 
                'GUI_friction': False, 
-                'trajPlot': "show.png",
+                'trajPlot': "test.png",
                 # 'dat_savePath': './output/test.txt',
-                'log_mp4': 'test.mp4'
+                # 'log_mp4': 'test.mp4'
                 }
+    
+    init_config = {
+                'disableConeFriction': True,
+                'initMaxPulseZero': True
+    }
 
 ############# Run #####################
-    c = CarRobot("../mecanum_simple/mecanum_simple.urdf", info_dict, GUI=True,
+    c = CarRobot("../mecanum_simple/mecanum_simple.urdf", info_dict, GUI=False, init_config=init_config,
                  options=options, timesteps = 3600, debug=False, start_pos=[0, 0, 0.0007], start_ori = [0, 0, 0, 1])
     c.run()

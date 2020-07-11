@@ -15,6 +15,20 @@ wheel_id = [0, 20, 40, 60]
 wheel_name = ['BR', 'FR', 'BL', 'BF']
 wheel_velocity = [-10 ,12, 10, 14]
 
+for j in range(p.getNumJoints(robotId)):
+    info = p.getJointInfo(robotId, j)
+    jid = info[0]
+    jname = info[1].decode("utf-8")
+    jtype = info[2]
+    if jtype == p.JOINT_REVOLUTE:
+        print(jname)
+        p.setJointMotorControl2(bodyUniqueId=robotId, 
+                                jointIndex=jid, 
+                                controlMode=p.VELOCITY_CONTROL,
+                                force = 0)
+
+p.setPhysicsEngineParameter(enableConeFriction=0)
+
 for wid, wvec in zip(wheel_id, wheel_velocity):
     p.setJointMotorControl2(bodyUniqueId=robotId, 
                             jointIndex=wid, 

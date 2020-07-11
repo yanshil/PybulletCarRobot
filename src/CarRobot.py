@@ -31,13 +31,14 @@ def plotTrajectory(xyData, filename=None):
 
 class CarRobot():
     def __init__(self, robot_file, info_dict, timesteps=-1, GUI=False, debug=False, options={}, 
-                 start_pos = [0, 0, 0.0007], start_ori =[0, 0, 0, 1]):
+                 start_pos = [0, 0, 0.0007], start_ori =[0, 0, 0, 1], init_config = {}):
         self.robot_file = robot_file
         self.info_dict = info_dict
         self.debug = debug
         self.GUI = GUI
         self.ts = timesteps
         self.options = options
+        self.init_config = init_config
 
         self.info_dict['global_GUI_para'] = {}
         self.flag_exceed = True
@@ -63,6 +64,11 @@ class CarRobot():
         p.setTimeStep(0.01)
         self.useRealTimeSim = False
         p.setRealTimeSimulation(self.useRealTimeSim)
+        
+        if 'disableConeFriction' in self.init_config.keys() and self.init_config['disableConeFriction']:
+            print("disableConeFriction")
+            p.setPhysicsEngineParameter(enableConeFriction=0) ## disable coneFriction
+
         planeId = p.loadURDF("plane.urdf")
         print("planeId: ", planeId)
 
@@ -70,6 +76,18 @@ class CarRobot():
         self.robotId = p.loadURDF(robot_file,
                                   start_pos, start_ori, flags=p.URDF_USE_INERTIA_FROM_FILE)
         print("robotId: ", self.robotId)
+
+    def _initmaxMotorImpulse(self):
+        print("_initmaxMotorImpulse")
+        for j in range(p.getNumJoints(self.robotId)):
+            info = p.getJointInfo(self.robotId, j)
+            jid = info[0]
+            jtype = info[2]
+            
+            if jtype == p.JOINT_REVOLUTE:
+                p.setJointMotorControl2(self.robotId, jid, 
+                                controlMode=p.VELOCITY_CONTROL,
+                                force = 0)
 
     def _initDynamicDumpings(self):
         p.changeDynamics(self.robotId, -1, linearDamping=0, angularDamping=0)
@@ -203,6 +221,10 @@ class CarRobot():
         self._initDebugParaGUI()
 
         self._initDynamicDumpings()
+        
+        if 'initMaxPulseZero' in self.init_config.keys() and self.init_config['initMaxPulseZero']:
+            self._initmaxMotorImpulse() ## force=0 for all rev joint
+        
         self._initMotorStatus()
         self._initPhysicalParas()
 

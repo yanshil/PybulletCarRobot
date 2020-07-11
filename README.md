@@ -2,6 +2,13 @@
 
 This is a repo to store related material of [this issue](https://github.com/bulletphysics/bullet3/issues/2851)
 
+### 2020/7/11
+
+Update based on 
+
+> disable all the motor constraints of the Roller by this p.setJointMotorControl2(objUid, linkIndex, p.VELOCITY_CONTROL, force=0) which is a tedious work, so i just change the maxMotorImpulse to 0 when create the default motor constraint in the function PhysicsServerCommandProcessor::createJointMotors() and then rebuilt the engine.
+> disable the cone frition by this p.setPhysicsEngineParameter(enableConeFriction=0).
+
 
 ### 2020/6/26 
 
