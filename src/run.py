@@ -15,32 +15,35 @@ from CarRobot import CarRobot
 
 if __name__ == "__main__":
     info_dict = {
-        'jointId': {0: 'BackRight',
-                    20: 'FrontRight',
-                    40: 'BackLeft',
-                    60: 'FrontLeft'},
-        'init_motorStatus': {0: {'controlMode': 0, 'targetVelocity': -10, 'force': 5},
-                                20: {'controlMode': 0, 'targetVelocity': 12, 'force': 5},
-                                40: {'controlMode': 0, 'targetVelocity': 10, 'force': 5},
-                                60: {'controlMode': 0, 'targetVelocity': 14, 'force': 5}},
-        'init_physical_para': {0: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
-                                20: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
-                                40: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
-                                60: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0}}}
+        'jointId': {3: 'BackRight',
+                    7: 'FrontRight',
+                    2: 'BackLeft',
+                    5: 'FrontLeft'},
+        'init_motorStatus': {3: {'controlMode': 0, 'targetVelocity': -13, 'force': 5},
+                                7: {'controlMode': 0, 'targetVelocity':-8, 'force': 5},
+                                2: {'controlMode': 0, 'targetVelocity': 0, 'force': 5},
+                                5: {'controlMode': 0, 'targetVelocity': 20, 'force': 5}},
+        'init_physical_para': {3: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
+                                7: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
+                                2: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0},
+                                5: {'lateralFriction': .7, 'angularDamping': 0, 'linearDamping': 0, 'rollingFriction': 0, 'spinningFriction': 0}}}
 
     options = {'global_wheel_control': False, 
                'GUI_friction': False, 
-                'trajPlot': "test.png",
+                # 'trajPlot': "disableConeFriction_initMaxPulseZero.png",
+                # 'trajPlot': "initMaxPulseZeroOnly.png",
+                # 'trajPlot': "disableConeFrictionOnly.png",
+                'trajPlot': "original.png",
                 # 'dat_savePath': './output/test.txt',
                 # 'log_mp4': 'test.mp4'
                 }
     
     init_config = {
-                'disableConeFriction': True,
-                'initMaxPulseZero': True
+                # 'disableConeFriction': True,
+                # 'initMaxPulseZero': True
     }
 
 ############# Run #####################
-    c = CarRobot("../mecanum_simple/mecanum_simple.urdf", info_dict, GUI=False, init_config=init_config,
+    c = CarRobot("../Pybullet_racecar/racecar_fix_steer.urdf", info_dict, GUI=False, init_config=init_config,
                  options=options, timesteps = 3600, debug=False, start_pos=[0, 0, 0.0007], start_ori = [0, 0, 0, 1])
     c.run()
