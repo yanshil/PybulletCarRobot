@@ -14,7 +14,21 @@ robotId = p.loadURDF("racecar_fix_steer.urdf",cubeStartPos, cubeStartOrientation
 # {'right_rear_wheel_joint': 3, 'right_front_wheel_joint': 7, 'left_rear_wheel_joint': 2, 'left_front_wheel_joint': 5}
 wheel_id = [3, 7, 2, 5]
 wheel_name = ['BR', 'FR', 'BL', 'BF']
-wheel_velocity = [-13 ,-8, 0, 20]
+wheel_velocity = [-20 ,-10, 0, 10]
+
+for j in range(p.getNumJoints(robotId)):
+    info = p.getJointInfo(robotId, j)
+    jid = info[0]
+    jname = info[1].decode("utf-8")
+    jtype = info[2]
+    if jtype == p.JOINT_REVOLUTE:
+        print(jname)
+        p.setJointMotorControl2(bodyUniqueId=robotId, 
+                                jointIndex=jid, 
+                                controlMode=p.VELOCITY_CONTROL,
+                                force = 0)
+
+p.setPhysicsEngineParameter(enableConeFriction=0)
 
 for wid, wvec in zip(wheel_id, wheel_velocity):
     p.setJointMotorControl2(bodyUniqueId=robotId, 
