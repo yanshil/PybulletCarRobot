@@ -2,6 +2,31 @@
 
 This is a repo to store related material of [this issue](https://github.com/bulletphysics/bullet3/issues/2851)
 
+```
+pip install pybullet
+```
+
+Model:
+1. Pybullet_racecar
+2. simple_cuboid
+3. Mecanum_simple
+
+### Hello_example
+```
+cd Pybullet_racecar
+python hello_racecar.py
+```
+
+## Complex_custmoize
+```
+cd src
+python run.py
+```
+
+### About info_dict
+
+For every robot folder, it has it's own info_dict
+
 ### 2020/7/11
 
 Update based on 
